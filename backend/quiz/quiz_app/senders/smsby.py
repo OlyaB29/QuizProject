@@ -1,4 +1,4 @@
-# Для использования из инициализации класса
+
 import sys
 import urllib
 import requests

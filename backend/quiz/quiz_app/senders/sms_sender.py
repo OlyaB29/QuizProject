@@ -1,6 +1,7 @@
 from .smsby import SMSBY
 from .config import API_KEY
 
+
 sms = SMSBY(API_KEY, 'by')
 
 
