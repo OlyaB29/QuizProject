@@ -20,6 +20,13 @@ class CustomUserAdmin(UserAdmin):
     search_fields = ('username',)
     ordering = ('username',)
 
+    def get_queryset(self, request):
+        if request.user.is_superuser:
+            return super(CustomUserAdmin, self).get_queryset(request)
+        else:
+            qs = super(CustomUserAdmin, self).get_queryset(request)
+            return qs.filter(id=request.user.id)
+
 
 class QuizAdmin(admin.ModelAdmin):
     user_fieldsets = (

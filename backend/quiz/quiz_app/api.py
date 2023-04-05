@@ -1,22 +1,10 @@
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, renderer_classes
-from rest_framework.renderers import JSONRenderer
 from rest_framework import viewsets, permissions
 from .models import Quiz
 from .serializers import QuizSerializer, QuizDetailSerializer, QuizResultSerializer
-from .quiz_results_sender import send_quiz_results
+from .senders.tg_sender import send_results_tg
+from .senders.sms_sender import send_results_sms
 
-
-# @api_view(('POST',))
-# @renderer_classes((JSONRenderer,))
-# def send(request):
-#     # bot.send_quiz_results('5187812315', 'OK')
-#     id = request.POST['quiz']
-#     results = request.POST['results']
-#     contacts = request.POST['contacts']
-#     print(id, results, contacts)
-#     ok = {'ok': 'yes'}
-#     return Response(ok)
 
 def form_message(quiz, results, contacts):
     message = f'Результаты прохождения квиза "{quiz.title}":\n\n'
@@ -24,13 +12,27 @@ def form_message(quiz, results, contacts):
         message += '{}. {}\n'.format(res['question'], res['answer'])
     if contacts:
         message += '\nДанные участника:\n'
-        if contacts['name']:
+        if 'name' in contacts:
             message += 'Имя - {}\n'.format(contacts['name'])
-        if contacts['email']:
+        if 'email' in contacts:
             message += 'Email - {}\n'.format(contacts['email'])
-        if contacts['phone']:
+        if 'phone' in contacts:
             message += 'Телефон - {}\n'.format(contacts['phone'])
     return message
+
+
+def send_results(quiz, results, contacts):
+    msg = form_message(quiz, results, contacts)
+
+    if "TG" in quiz.send_results_type:
+        send_results_tg(quiz.user.tg_id, msg)
+    if "SMS" in quiz.send_results_type and quiz.user.phone:
+        resp = send_results_sms(msg[:10], quiz.user.phone)
+        print(resp)
+        if 'error' in resp:
+            if resp['error'] == 'incorrect phone number':
+                send_results_tg(quiz.user.tg_id, 'В сервисе квизов в Вашем аккаунте указан некорректный телефонный '
+                                                 'номер. Внесите изменения, пожалуйста')
 
 
 class ResultViewSet(viewsets.ViewSet):
@@ -46,10 +48,12 @@ class ResultViewSet(viewsets.ViewSet):
                 contacts = None
             quiz = Quiz.objects.get(id=quiz_id)
 
-            if "TG" in quiz.send_results_type:
-                send_quiz_results(quiz.user.tg_id, form_message(quiz, results, contacts))
+            try:
+                send_results(quiz, results, contacts)
+                return Response('ok')
+            except Exception as e:
+                return Response(e)
 
-            return Response('ok')
         return Response(serializer.errors)
 
 
