@@ -1,5 +1,5 @@
 import telebot
-from .config import sender_TOKEN
+from .senders_config import sender_TOKEN
 
 
 bot = telebot.TeleBot(token=sender_TOKEN)

@@ -1,0 +1,302 @@
+@import url('https://fonts.googleapis.com/css2?family=Black+And+White+Picture&family=Leckerli+One&family=Montserrat:wght@100;400;600&display=swap');
+@import 'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css';
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /*background-color: #b61515;*/
+    /*background-size: cover;*/
+}
+
+header {
+    background-color: rgba(178, 203, 175, 0.94);
+    width: 100%;
+    height: 520px;
+    position: fixed;
+}
+
+.item-photo {
+    position: relative;
+    width: 60%;
+    margin: 0 auto;
+}
+
+.item-photo img {
+    width: 100%;
+}
+
+.item-photo:after {
+    content: '';
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.title1, .title2 {
+    font-weight: bold;
+    text-align: center;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.title1 {
+    color: #d99b04;
+    font-size: 32px;
+}
+
+.all-quizzes {
+    padding-top: 540px;
+    background-color: rgba(248, 245, 62, 0.75);
+}
+
+.title2 {
+    color: #15b7ad;
+    font-size: 30px;
+    margin-bottom: 25px;
+}
+
+.quiz-list {
+    margin: 0 auto;
+    width: 40%;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 26px;
+    line-height: 40px;
+}
+
+.quiz-list a {
+    text-decoration: none;
+    color: #4f9852;
+}
+
+.quiz-list a:hover {
+    font-weight: bold;
+    color: #4d88b0;
+}
+
+.row {
+    min-height: 750px;
+    background-color: rgba(220, 249, 252, 0.78);
+}
+
+.item-image {
+    position: relative;
+    width: 100%;
+    margin-top: 80px;
+}
+
+.item-image img {
+    width: 100%;
+}
+
+.item-image:after {
+    content: '';
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(109, 226, 252, 0.19);
+}
+
+.to-quiz-list1, .to-quiz-list2 {
+    position: absolute;
+    left: 43%;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.to-quiz-list1 {
+    top: 4%;
+    color: #fae81d;
+}
+
+.to-quiz-list2 {
+    top: 58%;
+    color: #1cdaad;
+    line-height: 30px;
+}
+
+.to-quiz-list1 .p2 {
+    padding-left: 90px;
+}
+
+.to-quiz-list1 .p3 {
+    padding-left: 140px;
+    line-height: 63px;
+}
+
+.to-quiz-list1 .p4 {
+    padding-left: 147px;
+}
+
+.to-quiz-list2 .p2 {
+    padding-left: 40px;
+}
+
+.to-quiz-list2 .p3 {
+    padding-left: 150px;
+}
+
+.quizzes-link:hover .to-quiz-list1 {
+    color: #91f6ef;
+}
+
+.quizzes-link:hover .to-quiz-list2 {
+    color: #fac71f;
+}
+
+.background1 {
+    background: url(../img/istockphoto-846410208-612x612.jpg);
+    background-size: cover;
+    width: 100%;
+    height: 100%;
+}
+
+.background2 {
+    position: relative;
+    background-color: rgba(174, 215, 173, 0.63);
+    width: 100%;
+    height: 100%;
+}
+
+.quiz-space {
+    width: 90%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%)
+}
+
+.quiz-question-item-question, .quiz-indicator {
+    font-size: 26px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    text-align: center;
+    color: #efad09;
+}
+
+.quiz-question-item-answers {
+    font-size: 18px;
+    width: max-content;
+    margin: 0 auto;
+    padding-bottom: 20px;
+    color: #04609a;
+    list-style-type: none;
+}
+
+.btn-next {
+    width: 100px;
+    float: right;
+    margin-right: 20px;
+}
+
+.btn-next:hover, #btn-restart {
+    background-color: #fcfc64 !important;
+    color: #0e76fd !important;
+    font-weight: bold !important;
+}
+
+#btn-restart {
+    visibility: hidden;
+}
+
+#btn-restart:hover {
+    background-color: #5f90fa !important;
+    color: white !important;
+}
+
+.title-results {
+    color: #efad09;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.quiz--hidden,
+.questions--hidden {
+    display: none;
+}
+
+.answer-invalid {
+    color: red;
+}
+
+.answer-valid {
+    color: green;
+}
+
+.finish {
+    background-color: #f5e984;
+}
+
+.form-result {
+    padding-top: 25px;
+    padding-bottom: 40px;
+}
+
+.form-result h3 {
+    color: #15b7ad;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.form-data {
+    width: 40%;
+    margin: 0 auto;
+}
+
+.form-control {
+    margin-bottom: 10px;
+}
+
+/*.form-data button {*/
+/*    margin: 0 auto;*/
+/*    display: block;*/
+/*}*/
+
+.form-data button:hover {
+    background-color: #3fa8d7 !important;
+}
+
+.btn-next, #btn-restart, .form-control, .form-data button {
+    border-radius: 15px !important;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(10, 10, 10, 0.73);
+    z-index: 9999;
+    overflow: auto;
+}
+
+.modal-content {
+    max-width: 40%;
+    position: relative;
+    margin: 5% auto;
+}
+
+.modal-content img {
+    width: 100%;
+}
+
+.end-text {
+    position: absolute;
+    top: 87%;
+    color: #3da3d2;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+}
+
+

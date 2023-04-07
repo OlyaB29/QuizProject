@@ -1,5 +1,5 @@
 from .smsby import SMSBY
-from .config import API_KEY
+from .senders_config import API_KEY
 
 
 sms = SMSBY(API_KEY, 'by')

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Прохождение квиза</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="js/jquery-3.6.4.js"></script>
+    <script src="js/jquery.maskedinput.js"></script>
+    <script src="js/inputmask.js"></script>
+    <script type="module" src="js/axiosService.js"></script>
+</head>
+<body style="font-family: 'Montserrat', sans-serif">
+
+<div class="row">
+    <div class="col-5 image">
+        <div class="image-section">
+            <a class='quizzes-link' href="main.html">
+                <div class="item-image" id="item-image"></div>
+            </a>
+        </div>
+    </div>
+    <div class="col-7 quiz">
+        <div class="background1">
+            <div class="background2">
+                <div class="quiz-space" id="quiz-space">
+                    <div class="quiz-questions" id="quiz-questions"></div>
+                    <div class="quiz-indicator" id="quiz-indicator"></div>
+                    <div class="quiz-results" id="quiz-results"></div>
+                    <div class="quiz-controls">
+                        <button class="btn btn-primary btn-next" id="btn-next">Далее</button>
+                        <button class="btn btn-warning btn-restart" id="btn-restart">Пройти заново</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="finish">
+    <div class="form-result" id="form-result"></div>
+<!--    <div class="end" id="end"></div>-->
+</div>
+<div class="end" id="end"></div>
+<script type="module" src="js/quiz.js"></script>
+</body>
+</html>

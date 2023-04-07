@@ -4,7 +4,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 import re
 import aiohttp
-from config import TOKEN
+from bot_config import TOKEN
 import logging
 
 logging.basicConfig(level=logging.INFO)
