@@ -2,10 +2,11 @@ from aiogram import Bot, types, executor
 from aiogram.dispatcher import Dispatcher, FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-import re
 import aiohttp
-from bot_config import TOKEN
 import logging
+from bot_config import TOKEN
+from backend.quiz.quiz_app import validators
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -46,7 +47,8 @@ def create_keyboard(k):
 def create_message(data):
     to_send_message = '<b>Ваши данные:</b>\nИмя пользователя - ' + data.get('username') + '\nПароль - ' + data.get('password')
     if data.get('phone'):
-        to_send_message += '\nТелефон - ' + data.get('phone')
+        ph = data.get('phone')
+        to_send_message += '\nТелефон - +' + ph[:3] + '(' + ph[3:5] +') '+ ph[5:8] + ' ' + ph[8:10] + ' ' + ph[10:]
     to_send_message += '\n\nЕсли все верно, подтвердите'
     return to_send_message
 
@@ -74,21 +76,25 @@ async def start_bot(message: types.Message, state: FSMContext):
 
 @dp.message_handler(state=QuizAuthorCreate.set_username)
 async def define_username(message: types.Message, state: FSMContext):
-    await state.update_data(username=message.text)
-    await message.answer('👇 Введите пароль', reply_markup=create_keyboard('back'))
-    await QuizAuthorCreate.next()
+    if validators.validate_username(message.text):
+        await state.update_data(username=message.text)
+        await QuizAuthorCreate.next()
+        mess = '👇 Введите пароль'
+    else:
+        mess = 'Имя пользователя может включать строчные и заглавные латинские буквы, цифры, нижнее подчеркивание, ' \
+               'дефис и состоять минимум из 2 символов.\nВведите корректное имя пользователя'
+    await message.answer(mess, reply_markup=create_keyboard('back'))
 
 
 @dp.message_handler(state=QuizAuthorCreate.set_password)
 async def define_password(message: types.Message, state: FSMContext):
-    pattern_password = re.compile(r'^(?=.*[0-9].*)(?=.*[a-z].*)(?=.*[A-Z].*)[0-9a-zA-Z]{8,}$')
-    if pattern_password.match(message.text):
+    if validators.validate_password(message.text):
         await state.update_data(password=message.text)
         await QuizAuthorCreate.next()
         mess = '👇 Подтвердите пароль'
     else:
-        mess = 'Пароль должен содержать хотя бы одну цифру, строчную и заглавную латинскую букву и состоять минимум из ' \
-               '8 символов.\nВведите корректный пароль'
+        mess = 'Пароль должен содержать хотя бы одну цифру, строчную и заглавную латинскую букву, спец. символ и ' \
+               'состоять минимум из 8 символов.\nВведите корректный пароль'
     await message.answer(mess, reply_markup=create_keyboard('back'))
     await message.delete()
 
@@ -98,7 +104,7 @@ async def confirm_password(message: types.Message, state: FSMContext):
     data = await state.get_data()
     password = data.get('password')
     if message.text == password:
-        await message.answer('👇 Если желаете, введите номер телефона в формате +375xxxxxxxxx, по которому будут '
+        await message.answer('👇 Если желаете, введите белорусский номер мобильного телефона, по которому будут '
                              'приходить SMS с результатами прохождения ваших квизов (помимо сообщений в телеграмме',
                              reply_markup=create_keyboard('go_to_confirm'))
         await QuizAuthorCreate.next()
@@ -110,11 +116,15 @@ async def confirm_password(message: types.Message, state: FSMContext):
 
 @dp.message_handler(state=QuizAuthorCreate.set_phone)
 async def define_phone(message: types.Message, state: FSMContext):
-    await state.update_data(phone=message.text)
-    data = await state.get_data()
-    data_msg = await message.answer(create_message(data), reply_markup=create_keyboard('confirm'))
-    await state.update_data(msg=data_msg)
-    await QuizAuthorCreate.next()
+    phone = validators.validate_phone(message.text)
+    if phone:
+        await state.update_data(phone=phone)
+        data = await state.get_data()
+        data_msg = await message.answer(create_message(data), reply_markup=create_keyboard('confirm'))
+        await state.update_data(msg=data_msg)
+        await QuizAuthorCreate.next()
+    else:
+        await message.answer('Введите корректный для Беларуси мобильный номер телефона', reply_markup=create_keyboard('back'))
 
 
 @dp.callback_query_handler(lambda call: call.data == 'without_phone', state=QuizAuthorCreate.set_phone)
@@ -137,7 +147,6 @@ async def make_registration(call: types.CallbackQuery, state: FSMContext):
         await bot.answer_callback_query(call.id)
         data = await state.get_data()
         await data['msg'].delete()
-        # data['msg'] = None
         data['tg_id'] = call.message.chat.id
         data['is_staff'] = True
         data.pop('msg')
@@ -169,7 +178,7 @@ async def keyboard_answer(call: types.CallbackQuery, state: FSMContext):
             await QuizAuthorCreate.set_username.set()
             await bot.send_message(
                 chat_id=call.message.chat.id,
-                text='👇 Введите имя пользователя латиницей',
+                text='👇 Введите имя пользователя латиницей (может содержать цифры, подчеркивание, дефис)',
                 reply_markup=create_keyboard('back'))
         elif call.data == "back":
             await state.finish()

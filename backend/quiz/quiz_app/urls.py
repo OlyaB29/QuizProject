@@ -11,7 +11,6 @@ router.register('results', api.ResultViewSet, 'res')
 
 
 urlpatterns = [
-
     path('', include(router.urls)),
 ]
 

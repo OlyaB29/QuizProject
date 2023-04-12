@@ -2,6 +2,7 @@ from rest_framework.response import Response
 from rest_framework import viewsets, permissions
 from .models import Quiz
 from .serializers import QuizSerializer, QuizDetailSerializer, QuizResultSerializer
+from . import validators
 from .senders.tg_sender import send_results_tg
 from .senders.sms_sender import send_results_sms
 
@@ -13,11 +14,11 @@ def form_message(quiz, results, contacts):
     if contacts:
         message += '\nДанные участника:\n'
         if 'name' in contacts:
-            message += 'Имя - {}\n'.format(contacts['name'])
+            message += 'Имя - {}\n'.format(validators.validate_name(contacts['name']))
         if 'email' in contacts:
-            message += 'Email - {}\n'.format(contacts['email'])
+            message += 'Email - {}\n'.format(validators.validate_email(contacts['email']))
         if 'phone' in contacts:
-            message += 'Телефон - {}\n'.format(contacts['phone'])
+            message += 'Телефон - {}\n'.format(contacts['phone'] if validators.validate_phone(contacts['phone']) else 'не определен')
     return message
 
 
