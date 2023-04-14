@@ -5,7 +5,6 @@ from .decorators import phone_zone, name_params
 def validate_email(email):
     email_pattern = '[А-Яа-яёЁ\w.-]+@([A-Za-zА-Яа-яёЁ0-9][A-Za-zА-Яа-яёЁ0-9-]+\.)+[A-Za-zА-Яа-яёЁ0-9]{2,4}$'
     res = re.match(email_pattern, email)
-    print(res)
     return email if res else None
 
 

@@ -178,7 +178,7 @@ async def keyboard_answer(call: types.CallbackQuery, state: FSMContext):
             await QuizAuthorCreate.set_username.set()
             await bot.send_message(
                 chat_id=call.message.chat.id,
-                text='👇 Введите имя пользователя латиницей (может содержать цифры, подчеркивание, дефис)',
+                text='👇 Введите имя пользователя (может содержать цифры, подчеркивание, дефис)',
                 reply_markup=create_keyboard('back'))
         elif call.data == "back":
             await state.finish()

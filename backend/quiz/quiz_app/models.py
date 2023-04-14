@@ -43,7 +43,7 @@ class Question(models.Model):
     number = models.IntegerField('Порядковый номер вопроса', null=False)
 
     def __str__(self):
-        return self.text[:20]
+        return self.text[:40]
 
     class Meta:
         verbose_name = "Вопрос"
@@ -58,7 +58,7 @@ class Answer(models.Model):
     is_correct = models.BooleanField('Правильный', null=False)
 
     def __str__(self):
-        return self.text[:20]
+        return self.text[:40]
 
     class Meta:
         verbose_name = "Ответ"
