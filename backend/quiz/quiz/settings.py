@@ -31,17 +31,18 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'quiz_app.apps.QuizAppConfig',
-    'rest_framework',
-    'rest_framework.authtoken',
-    'djoser',
-    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'quiz_app.apps.QuizAppConfig',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'djoser',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
