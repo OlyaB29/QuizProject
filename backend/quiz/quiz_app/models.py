@@ -22,7 +22,7 @@ class Quiz(models.Model):
         ("SMS", 'По SMS'),
         ("TG-SMS", 'В телеграмм и по SMS'),
     ]
-    user = models.ForeignKey(User, verbose_name="Автор", related_name='quizzes', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, db_column='user', verbose_name="Автор", related_name='quizzes', on_delete=models.CASCADE)
     title = models.CharField('Название квиза', max_length=500)
     send_results_type = models.CharField('Тип отправки результатов', max_length=6, choices=SEND_TYPES, default="TG")
     is_send_name = models.BooleanField('Отправка имени', default=False)

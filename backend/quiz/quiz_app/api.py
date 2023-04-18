@@ -28,7 +28,7 @@ def send_results(quiz, results, contacts):
     if "TG" in quiz.send_results_type:
         send_results_tg(quiz.user.tg_id, msg)
     if "SMS" in quiz.send_results_type and quiz.user.phone:
-        resp = send_results_sms(msg[:10], quiz.user.phone)
+        resp = send_results_sms(msg, quiz.user.phone)
         print(resp)
         if 'error' in resp:
             if resp['error'] == 'incorrect phone number':
