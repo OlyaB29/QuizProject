@@ -4,7 +4,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 import aiohttp
 import logging
-from bot_config import TOKEN
+from bots.bot_config import TOKEN
 from backend.quiz.quiz_app import validators
 
 
@@ -130,10 +130,9 @@ async def define_phone(message: types.Message, state: FSMContext):
 @dp.callback_query_handler(lambda call: call.data == 'without_phone', state=QuizAuthorCreate.set_phone)
 async def without_phone(call: types.CallbackQuery, state: FSMContext):
     if call.message:
-        await bot.answer_callback_query(call.id)
+        # await bot.answer_callback_query(call.id)
         data = await state.get_data()
-        data_msg = await bot.send_message(
-            chat_id=call.message.chat.id,
+        data_msg = await call.message.answer(
             text=create_message(data),
             reply_markup=create_keyboard('confirm')
         )
@@ -144,13 +143,16 @@ async def without_phone(call: types.CallbackQuery, state: FSMContext):
 @dp.callback_query_handler(lambda call: call.data == 'ok', state=QuizAuthorCreate.confirm)
 async def make_registration(call: types.CallbackQuery, state: FSMContext):
     if call.message:
-        await bot.answer_callback_query(call.id)
+        # await bot.answer_callback_query(call.id)
         data = await state.get_data()
-        await data['msg'].delete()
+        try:
+            await data['msg'].delete()
+            data.pop('msg')
+        except Exception as e:
+            print(e)
         data['tg_id'] = call.message.chat.id
         data['is_staff'] = True
-        data.pop('msg')
-        print(data)
+
         result = await user_register(data)
         if result[0] == 201:
             msg = 'Поздравляем! Регистрация прошла успешно!\nМожете приступать к работе.\n\n' \
@@ -161,8 +163,7 @@ async def make_registration(call: types.CallbackQuery, state: FSMContext):
         else:
             msg = 'Что-то пошло не так, попробуйте сначала'
 
-        await bot.send_message(
-            chat_id=call.message.chat.id,
+        await call.message.answer(
             text=msg,
             reply_markup=create_keyboard('main')
         )
@@ -172,18 +173,16 @@ async def make_registration(call: types.CallbackQuery, state: FSMContext):
 @dp.callback_query_handler(lambda call: True, state='*')
 async def keyboard_answer(call: types.CallbackQuery, state: FSMContext):
     if call.message:
-        await bot.answer_callback_query(call.id)
+        # await bot.answer_callback_query(call.id)
         if call.data == "register":
             await state.finish()
             await QuizAuthorCreate.set_username.set()
-            await bot.send_message(
-                chat_id=call.message.chat.id,
+            await call.message.answer(
                 text='👇 Введите имя пользователя (может содержать цифры, подчеркивание, дефис)',
                 reply_markup=create_keyboard('back'))
         elif call.data == "back":
             await state.finish()
-            await bot.send_message(
-                chat_id=call.message.chat.id,
+            await call.message.answer(
                 text='👇 Сделайте свой выбор',
                 reply_markup=create_keyboard('main'))
 
