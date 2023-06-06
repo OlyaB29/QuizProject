@@ -5,9 +5,14 @@ from .serializers import QuizSerializer, QuizDetailSerializer, QuizResultSeriali
 from . import validators
 from .senders.tg_sender import send_results_tg
 from .senders.sms_sender import send_results_sms
+import redis
+from datetime import date
+from django.conf import settings
+
+redis_client = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, password="Panterka29!")
 
 
-def form_message(quiz, results, contacts):
+def form_message(quiz, results, contacts, lead_quizzes):
     message = f'Результаты прохождения квиза "{quiz.title}":\n\n'
     for res in results:
         message += '{}. {}\n'.format(res['question'], res['answer'])
@@ -19,11 +24,14 @@ def form_message(quiz, results, contacts):
             message += 'Email - {}\n'.format(validators.validate_email(contacts['email']))
         if 'phone' in contacts:
             message += 'Телефон - {}\n'.format(contacts['phone'] if validators.validate_phone(contacts['phone']) else 'не определен')
+    message += 'Лидеры среди Ваших квизов сегодня (пройдено раз: {}):\n'.format(lead_quizzes[0][1])
+    for quiz in lead_quizzes:
+        message += '{}\n'.format(quiz[0]['title'])
     return message
 
 
 def send_results(quiz, results, contacts):
-    msg = form_message(quiz, results, contacts)
+    msg = form_message(quiz, results, contacts, save_to_redis(quiz))
 
     if "TG" in quiz.send_results_type:
         send_results_tg(quiz.user.tg_id, msg)
@@ -34,6 +42,22 @@ def send_results(quiz, results, contacts):
             if resp['error'] == 'incorrect phone number':
                 send_results_tg(quiz.user.tg_id, 'В сервисе квизов в Вашем аккаунте указан некорректный телефонный '
                                                  'номер. Внесите изменения, пожалуйста')
+
+
+def save_to_redis(quiz):
+    # Фиксируем в redis факт очередного прохождения конкретного квиза за сегодня, срок действия ключа 24 часа
+    value = redis_client.get("{}_{}".format(date.today(), quiz.id))
+    value = int(value) + 1 if value else 1
+    redis_client.set("{}_{}".format(date.today(), quiz.id), value, 86400)
+
+    # Находим среди квизов данного автора лидеров на сегодня
+    user_quizzes = list(Quiz.objects.filter(user=quiz.user.id).values())
+    redis_values = list(map(lambda quiz: (quiz, redis_client.get("{}_{}".format(date.today(), quiz["id"]))), user_quizzes))
+    quizzes_in_redis = list(filter(lambda el: el[1] is not None, redis_values))
+    max_value = max(list(map(lambda el: int(el[1]), quizzes_in_redis)))
+    lead_quizzes = list(map(lambda el: (el[0], int(el[1])), list(filter(lambda el: int(el[1]) == max_value, quizzes_in_redis))))
+
+    return lead_quizzes
 
 
 class ResultViewSet(viewsets.ViewSet):
@@ -67,3 +91,10 @@ class QuizViewSet(viewsets.ModelViewSet):
             return QuizDetailSerializer
         else:
             return QuizSerializer
+
+    # def retrieve(self, request, *args, **kwargs):
+    #     quiz=self.get_object()
+    #     return Response(str(save_to_redis(quiz)))
+
+
+

@@ -1,6 +1,6 @@
 from unittest import TestCase
-from unittest.mock import Mock, patch
-from ..api import send_results, send_results_tg, form_message
+from unittest.mock import patch
+from ..api import send_results
 from ..models import User, Quiz
 
 

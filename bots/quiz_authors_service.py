@@ -6,7 +6,11 @@ import aiohttp
 import logging
 from bots.bot_config import TOKEN
 from backend.quiz.quiz_app import validators
-
+# import sys
+# sys.path.append('/home/OlyaB29/QuizProject/backend/quiz')
+# from quiz_app import validators
+# PROXY_URL = "http://proxy.server:3128"
+# bot = Bot(token=TOKEN, parse_mode=types.ParseMode.HTML, proxy=PROXY_URL)
 
 logging.basicConfig(level=logging.INFO)
 
