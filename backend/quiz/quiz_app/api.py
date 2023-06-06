@@ -8,8 +8,13 @@ from .senders.sms_sender import send_results_sms
 import redis
 from datetime import date
 from django.conf import settings
+from django.core.cache import cache
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
+from .redis_conf import PASSWORD
 
-redis_client = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, password="Panterka29!")
+CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
+
+redis_client = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, password=PASSWORD)
 
 
 def form_message(quiz, results, contacts, lead_quizzes):
@@ -92,9 +97,17 @@ class QuizViewSet(viewsets.ModelViewSet):
         else:
             return QuizSerializer
 
-    # def retrieve(self, request, *args, **kwargs):
-    #     quiz=self.get_object()
-    #     return Response(str(save_to_redis(quiz)))
+    def retrieve(self, request, *args, **kwargs):
+        quiz = self.get_object()
+        if quiz.id in cache:
+            # берем данные из cache
+            quiz = cache.get(quiz.id)
+            return Response(quiz)
+        else:
+            serializer = self.get_serializer(quiz)
+            # сохраняем данные в cache
+            cache.set(quiz.id, serializer.data, timeout=CACHE_TTL)
+            return Response(serializer.data)
 
 
 
